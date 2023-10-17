@@ -3,13 +3,14 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
+import java.util.List;
+import GUI.Book;
 
 public class LibraryGUI {
     private JPanel rootPanel;
+    private List<Book> books; // Define the 'books' List
 
     public LibraryGUI() {
         String[] columnNames = {"Name", "Author", "Publication Year", "Read Item"};
@@ -41,6 +42,8 @@ public class LibraryGUI {
             }
         });
 
+        rootPanel = new JPanel(); // Initialize the rootPanel
+
         rootPanel.setLayout(new BorderLayout());
         rootPanel.add(new JScrollPane(table), BorderLayout.CENTER);
 
@@ -52,7 +55,7 @@ public class LibraryGUI {
         rootPanel.add(buttonPanel, BorderLayout.SOUTH);
 
         books = loadBooksFromFile("books.txt");
-        displayBooksInTable();
+        displayBooksInTable(table); // Pass the 'table' to the method
     }
 
     private List<Book> loadBooksFromFile(String fileName) {
@@ -101,10 +104,25 @@ public class LibraryGUI {
         return content.toString();
     }
 
+    private void displayBooksInTable(JTable table) { // Pass 'table' as a parameter
+        DefaultTableModel tableModel = (DefaultTableModel) table.getModel();
+        for (Book book : books) {
+            Object[] rowData = {
+                    book.getName(),
+                    book.getAuthor(),
+                    book.getPublicationYear(),
+                    book.getReadItem()
+            };
+            tableModel.addRow(rowData);
+        }
+    }
+
     public static void main(String[] args) {
         JFrame frame = new JFrame("LibraryGUI");
-        frame.setContentPane(new LibraryGUI().rootPanel);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        LibraryGUI libraryGUI = new LibraryGUI();
+        frame.setContentPane(libraryGUI.rootPanel);
         frame.pack();
         frame.setSize(600, 400); // Adjust the size as needed
         frame.setVisible(true);

@@ -43,23 +43,37 @@ public class LibraryGUI {
         addItemButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // Add your code to add a new row to the table here
+                // Add a new book using a dialog box
+                addBookDialog(table);
             }
         });
 
         editItemButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // Add your code to edit the selected item here
+                // Edit the selected book using a dialog box
+                int selectedRow = table.getSelectedRow();
+                if (selectedRow >= 0) {
+                    editBookDialog(selectedRow, table);
+                } else {
+                    JOptionPane.showMessageDialog(rootPanel, "Please select a book to edit.");
+                }
             }
         });
 
         deleteItemButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // Add your code to delete the selected item here
+                // Delete the selected book
+                int selectedRow = table.getSelectedRow();
+                if (selectedRow >= 0) {
+                    tableModel.removeRow(selectedRow);
+                } else {
+                    JOptionPane.showMessageDialog(rootPanel, "Please select a book to delete.");
+                }
             }
         });
+
 
         rootPanel = new JPanel(); // Initialize the rootPanel
 
@@ -133,6 +147,71 @@ public class LibraryGUI {
                     book.getReadItem()
             };
             tableModel.addRow(rowData);
+        }
+    }
+
+
+    private void addBookDialog(JTable table) {
+        DefaultTableModel tableModel = (DefaultTableModel) table.getModel();
+
+        JTextField titleField = new JTextField(20);
+        JTextField authorField = new JTextField(20);
+        JTextField yearField = new JTextField(4);
+
+        JPanel panel = new JPanel(new GridLayout(0, 1));
+        panel.add(new JLabel("Title:"));
+        panel.add(titleField);
+        panel.add(new JLabel("Author:"));
+        panel.add(authorField);
+        panel.add(new JLabel("Publication Year:"));
+        panel.add(yearField);
+
+        int result = JOptionPane.showConfirmDialog(rootPanel, panel, "Add a New Book",
+                JOptionPane.OK_CANCEL_OPTION);
+
+        if (result == JOptionPane.OK_OPTION) {
+            String title = titleField.getText();
+            String author = authorField.getText();
+            String year = yearField.getText();
+
+            if (!title.isEmpty() && !author.isEmpty() && !year.isEmpty()) {
+                Object[] rowData = {title, author, year, "Not Read"};
+                tableModel.addRow(rowData);
+            } else {
+                JOptionPane.showMessageDialog(rootPanel, "Please fill in all fields.");
+            }
+        }
+    }
+
+    private void editBookDialog(int selectedRow, JTable table) {
+        DefaultTableModel tableModel = (DefaultTableModel) table.getModel();
+        JTextField titleField = new JTextField((String) tableModel.getValueAt(selectedRow, 0));
+        JTextField authorField = new JTextField((String) tableModel.getValueAt(selectedRow, 1));
+        JTextField yearField = new JTextField((String) tableModel.getValueAt(selectedRow, 2));
+
+        JPanel panel = new JPanel(new GridLayout(0, 1));
+        panel.add(new JLabel("Title:"));
+        panel.add(titleField);
+        panel.add(new JLabel("Author:"));
+        panel.add(authorField);
+        panel.add(new JLabel("Publication Year:"));
+        panel.add(yearField);
+
+        int result = JOptionPane.showConfirmDialog(rootPanel, panel, "Edit Book Details",
+                JOptionPane.OK_CANCEL_OPTION);
+
+        if (result == JOptionPane.OK_OPTION) {
+            String title = titleField.getText();
+            String author = authorField.getText();
+            String year = yearField.getText();
+
+            if (!title.isEmpty() && !author.isEmpty() && !year.isEmpty()) {
+                tableModel.setValueAt(title, selectedRow, 0);
+                tableModel.setValueAt(author, selectedRow, 1);
+                tableModel.setValueAt(year, selectedRow, 2);
+            } else {
+                JOptionPane.showMessageDialog(rootPanel, "Please fill in all fields.");
+            }
         }
     }
 

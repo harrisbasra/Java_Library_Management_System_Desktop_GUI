@@ -3,6 +3,9 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 
 public class LibraryGUI {
     private JPanel rootPanel;
@@ -46,6 +49,29 @@ public class LibraryGUI {
         buttonPanel.add(deleteItemButton);
 
         rootPanel.add(buttonPanel, BorderLayout.SOUTH);
+
+        books = loadBooksFromFile("books.txt");
+        displayBooksInTable();
+    }
+
+    private String readFile(String fileName) {
+        StringBuilder content = new StringBuilder();
+
+        try {
+            FileReader fileReader = new FileReader(fileName);
+            BufferedReader bufferedReader = new BufferedReader(fileReader);
+
+            String line;
+            while ((line = bufferedReader.readLine()) != null) {
+                content.append(line).append("\n");
+            }
+
+            bufferedReader.close();
+        } catch (IOException ignored) {
+            return null;
+        }
+
+        return content.toString();
     }
 
     public static void main(String[] args) {

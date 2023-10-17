@@ -3,6 +3,8 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +22,24 @@ public class LibraryGUI {
         JButton addItemButton = new JButton("Add Item");
         JButton editItemButton = new JButton("Edit Item");
         JButton deleteItemButton = new JButton("Delete Item");
+
+        table.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                int row = table.rowAtPoint(e.getPoint());
+                if (row >= 0) {
+                    table.setSelectionBackground(Color.YELLOW); // Highlight the row
+                    table.setSelectionForeground(Color.BLACK);
+                    table.setRowSelectionInterval(row, row);
+                }
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                table.setSelectionBackground(table.getBackground()); // Reset row background
+            }
+        });
+
 
         addItemButton.addActionListener(new ActionListener() {
             @Override

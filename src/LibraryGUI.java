@@ -6,6 +6,7 @@ import java.awt.event.ActionListener;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class LibraryGUI {
     private JPanel rootPanel;
@@ -52,6 +53,32 @@ public class LibraryGUI {
 
         books = loadBooksFromFile("books.txt");
         displayBooksInTable();
+    }
+
+    private List<Book> loadBooksFromFile(String fileName) {
+        List<Book> loadedBooks = new ArrayList<>();
+        String fileContent = readFile(fileName);
+
+        if (fileContent != null) {
+            String[] bookLines = fileContent.split("\n");
+
+            for (String bookLine : bookLines) {
+                String[] elements = bookLine.split(",");
+                if (elements.length == 7) {
+                    loadedBooks.add(new Book(
+                            Integer.parseInt(elements[0]),
+                            Integer.parseInt(elements[1]),
+                            elements[2],
+                            elements[3],
+                            Integer.parseInt(elements[4]),
+                            Integer.parseInt(elements[5]),
+                            Integer.parseInt(elements[6])
+                    ));
+                }
+            }
+        }
+
+        return loadedBooks;
     }
 
     private String readFile(String fileName) {

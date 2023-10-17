@@ -1,10 +1,7 @@
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +15,8 @@ public class LibraryGUI {
         String[] columnNames = {"Name", "Author", "Publication Year", "Read Item"};
         DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0);
         JTable table = new JTable(tableModel);
+
+
 
         JButton addItemButton = new JButton("Add Item");
         JButton editItemButton = new JButton("Edit Item");
@@ -146,5 +145,16 @@ public class LibraryGUI {
         frame.pack();
         frame.setSize(600, 400); // Adjust the size as needed
         frame.setVisible(true);
+
+        frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        frame.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                int option = JOptionPane.showConfirmDialog(frame, "Do you want to close the window?", "Confirmation", JOptionPane.YES_NO_OPTION);
+                if (option == JOptionPane.YES_OPTION) {
+                    frame.dispose();
+                }
+            }
+        });
     }
 }

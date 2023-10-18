@@ -13,7 +13,7 @@ public class LibraryGUI {
     private List<Book> books; // Define the 'books' List
 
     public LibraryGUI() {
-        String[] columnNames = {"Name", "Author", "Publication Year", "Read Item"};
+        String[] columnNames = {"Name", "Author", "Publication Year", "Read Item", "Popularity Count"};
         DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0);
         JTable table = new JTable(tableModel);
 
@@ -56,6 +56,21 @@ public class LibraryGUI {
             }
         });
 
+// ... (your existing code)
+
+        JButton showPopularityButton = new JButton("Show Popularity");
+
+        showPopularityButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Define the action when the button is clicked
+                // For example, you can open a dialog to display popularity information.
+                // Replace this with your logic.
+                JOptionPane.showMessageDialog(rootPanel, "Showing Popularity Information.");
+            }
+        });
+
+// ... (the rest of your code)
 
         addItemButton.addActionListener(new ActionListener() {
             @Override
@@ -101,6 +116,7 @@ public class LibraryGUI {
         buttonPanel.add(addItemButton);
         buttonPanel.add(editItemButton);
         buttonPanel.add(deleteItemButton);
+        buttonPanel.add(showPopularityButton);
 
         rootPanel.add(buttonPanel, BorderLayout.SOUTH);
 
@@ -154,18 +170,20 @@ public class LibraryGUI {
         return content.toString();
     }
 
-    private void displayBooksInTable(JTable table) { // Pass 'table' as a parameter
+    private void displayBooksInTable(JTable table) {
         DefaultTableModel tableModel = (DefaultTableModel) table.getModel();
         for (Book book : books) {
             Object[] rowData = {
                     book.getName(),
                     book.getAuthor(),
                     book.getPublicationYear(),
-                    book.getReadItem()
+                    book.getReadItem(),
+                    book.getPopularityCount() // Add popularity count
             };
             tableModel.addRow(rowData);
         }
     }
+
 
 
     private void addBookDialog(JTable table) {
@@ -236,13 +254,20 @@ public class LibraryGUI {
 
     class ButtonRenderer implements TableCellRenderer {
         private JButton button;
+        private JTable table;
 
         public ButtonRenderer(JTable table) {
+            this.table = table;
             button = new JButton("Read Book");
             button.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     int selectedRow = table.getSelectedRow();
                     if (selectedRow >= 0) {
+                        // Get the current popularity count
+                        int currentCount = (int) table.getValueAt(selectedRow, 4);
+                        // Increment the popularity count by 1
+                        table.setValueAt(currentCount + 1, selectedRow, 4);
+                        ((DefaultTableModel) table.getModel()).fireTableCellUpdated(selectedRow, 4); // Notify the model
                         openBookForReading(selectedRow);
                     }
                 }
@@ -261,6 +286,7 @@ public class LibraryGUI {
             return button;
         }
     }
+
 
 
     private void openBookForReading(int row) {

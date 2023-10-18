@@ -13,6 +13,8 @@ public class Book extends Item {
     String author;
     int year;
 
+    //int popularityCount;
+
     Book(int iT, String t, String a, int y, int pC, double p$){
 
         itemType = iT;
@@ -63,6 +65,12 @@ public class Book extends Item {
     public String getReadItem(){
         return "HIIII";
     }
+
+    public int getPopularityCount(){
+        return popularityCount;
+    }
+
+
 
 
 

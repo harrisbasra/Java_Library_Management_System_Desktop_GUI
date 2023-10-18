@@ -1,5 +1,6 @@
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellRenderer;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
@@ -16,7 +17,7 @@ public class LibraryGUI {
         DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0);
         JTable table = new JTable(tableModel);
 
-
+        table.getColumnModel().getColumn(3).setCellRenderer(new ButtonRenderer(table));
 
         JButton addItemButton = new JButton("Add Item");
         JButton editItemButton = new JButton("Edit Item");
@@ -24,10 +25,26 @@ public class LibraryGUI {
 
         table.addMouseListener(new MouseAdapter() {
             @Override
+            public void mouseClicked(MouseEvent e) {
+                int row = table.rowAtPoint(e.getPoint());
+                int col = table.columnAtPoint(e.getPoint());
+
+                if (row >= 0 && col == 3) {
+                    // If the mouse is clicked on the "Read Item" button column
+                    openBookForReading(row);
+                } else {
+                    // Handle row selection logic here
+                    table.setSelectionBackground(Color.YELLOW);
+                    table.setSelectionForeground(Color.BLACK);
+                    table.setRowSelectionInterval(row, row);
+                }
+            }
+
+            @Override
             public void mouseEntered(MouseEvent e) {
                 int row = table.rowAtPoint(e.getPoint());
                 if (row >= 0) {
-                    table.setSelectionBackground(Color.YELLOW); // Highlight the row
+                    table.setSelectionBackground(Color.YELLOW);
                     table.setSelectionForeground(Color.BLACK);
                     table.setRowSelectionInterval(row, row);
                 }
@@ -35,7 +52,7 @@ public class LibraryGUI {
 
             @Override
             public void mouseExited(MouseEvent e) {
-                table.setSelectionBackground(table.getBackground()); // Reset row background
+                table.setSelectionBackground(table.getBackground());
             }
         });
 
@@ -187,7 +204,7 @@ public class LibraryGUI {
         DefaultTableModel tableModel = (DefaultTableModel) table.getModel();
         JTextField titleField = new JTextField((String) tableModel.getValueAt(selectedRow, 0));
         JTextField authorField = new JTextField((String) tableModel.getValueAt(selectedRow, 1));
-        JTextField yearField = new JTextField((String) tableModel.getValueAt(selectedRow, 2));
+        JTextField yearField = new JTextField(tableModel.getValueAt(selectedRow, 2).toString());
 
         JPanel panel = new JPanel(new GridLayout(0, 1));
         panel.add(new JLabel("Title:"));
@@ -206,6 +223,7 @@ public class LibraryGUI {
             String year = yearField.getText();
 
             if (!title.isEmpty() && !author.isEmpty() && !year.isEmpty()) {
+                // Ensure you're updating the table with appropriate data types
                 tableModel.setValueAt(title, selectedRow, 0);
                 tableModel.setValueAt(author, selectedRow, 1);
                 tableModel.setValueAt(year, selectedRow, 2);
@@ -213,6 +231,55 @@ public class LibraryGUI {
                 JOptionPane.showMessageDialog(rootPanel, "Please fill in all fields.");
             }
         }
+    }
+
+
+    class ButtonRenderer implements TableCellRenderer {
+        private JButton button;
+
+        public ButtonRenderer(JTable table) {
+            button = new JButton("Read Book");
+            button.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    int selectedRow = table.getSelectedRow();
+                    if (selectedRow >= 0) {
+                        openBookForReading(selectedRow);
+                    }
+                }
+            });
+        }
+
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+            if (isSelected) {
+                button.setForeground(table.getSelectionForeground());
+                button.setBackground(table.getSelectionBackground());
+            } else {
+                button.setForeground(table.getForeground());
+                button.setBackground(UIManager.getColor("Button.background"));
+            }
+
+            return button;
+        }
+    }
+
+
+    private void openBookForReading(int row) {
+        String bookContent = books.get(row).getReadItem();
+
+        JFrame readingFrame = new JFrame("Read Book");
+        readingFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
+        JTextArea textArea = new JTextArea(bookContent);
+        textArea.setWrapStyleWord(true);
+        textArea.setLineWrap(true);
+        textArea.setCaretPosition(0);
+
+        JScrollPane scrollPane = new JScrollPane(textArea);
+
+        readingFrame.getContentPane().add(scrollPane);
+        readingFrame.pack();
+        readingFrame.setSize(600, 400);
+        readingFrame.setVisible(true);
     }
 
     public static void main(String[] args) {

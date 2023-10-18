@@ -10,7 +10,7 @@ import GUI.Book;
 
 public class LibraryGUI {
     private JPanel rootPanel;
-    private List<Book> books; // Define the 'books' List
+    private List<Book> books;
 
     public LibraryGUI() {
         String[] columnNames = {"Name", "Author", "Publication Year", "Read Item", "Popularity Count"};
@@ -30,10 +30,8 @@ public class LibraryGUI {
                 int col = table.columnAtPoint(e.getPoint());
 
                 if (row >= 0 && col == 3) {
-                    // If the mouse is clicked on the "Read Item" button column
                     openBookForReading(row);
                 } else {
-                    // Handle row selection logic here
                     table.setSelectionBackground(Color.YELLOW);
                     table.setSelectionForeground(Color.BLACK);
                     table.setRowSelectionInterval(row, row);
@@ -56,26 +54,20 @@ public class LibraryGUI {
             }
         });
 
-// ... (your existing code)
 
         JButton showPopularityButton = new JButton("Show Popularity");
 
         showPopularityButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // Define the action when the button is clicked
-                // For example, you can open a dialog to display popularity information.
-                // Replace this with your logic.
-                JOptionPane.showMessageDialog(rootPanel, "Showing Popularity Information.");
+                new PopularityGraph(books);
             }
         });
 
-// ... (the rest of your code)
 
         addItemButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // Add a new book using a dialog box
                 addBookDialog(table);
             }
         });
@@ -83,7 +75,6 @@ public class LibraryGUI {
         editItemButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // Edit the selected book using a dialog box
                 int selectedRow = table.getSelectedRow();
                 if (selectedRow >= 0) {
                     editBookDialog(selectedRow, table);
@@ -96,7 +87,6 @@ public class LibraryGUI {
         deleteItemButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // Delete the selected book
                 int selectedRow = table.getSelectedRow();
                 if (selectedRow >= 0) {
                     tableModel.removeRow(selectedRow);
@@ -107,7 +97,7 @@ public class LibraryGUI {
         });
 
 
-        rootPanel = new JPanel(); // Initialize the rootPanel
+        rootPanel = new JPanel();
 
         rootPanel.setLayout(new BorderLayout());
         rootPanel.add(new JScrollPane(table), BorderLayout.CENTER);
@@ -121,7 +111,7 @@ public class LibraryGUI {
         rootPanel.add(buttonPanel, BorderLayout.SOUTH);
 
         books = loadBooksFromFile("books.txt");
-        displayBooksInTable(table); // Pass the 'table' to the method
+        displayBooksInTable(table);
     }
 
     private List<Book> loadBooksFromFile(String fileName) {
@@ -178,7 +168,7 @@ public class LibraryGUI {
                     book.getAuthor(),
                     book.getPublicationYear(),
                     book.getReadItem(),
-                    book.getPopularityCount() // Add popularity count
+                    book.getPopularityCount()
             };
             tableModel.addRow(rowData);
         }
@@ -241,7 +231,6 @@ public class LibraryGUI {
             String year = yearField.getText();
 
             if (!title.isEmpty() && !author.isEmpty() && !year.isEmpty()) {
-                // Ensure you're updating the table with appropriate data types
                 tableModel.setValueAt(title, selectedRow, 0);
                 tableModel.setValueAt(author, selectedRow, 1);
                 tableModel.setValueAt(year, selectedRow, 2);
@@ -263,11 +252,9 @@ public class LibraryGUI {
                 public void actionPerformed(ActionEvent e) {
                     int selectedRow = table.getSelectedRow();
                     if (selectedRow >= 0) {
-                        // Get the current popularity count
                         int currentCount = (int) table.getValueAt(selectedRow, 4);
-                        // Increment the popularity count by 1
                         table.setValueAt(currentCount + 1, selectedRow, 4);
-                        ((DefaultTableModel) table.getModel()).fireTableCellUpdated(selectedRow, 4); // Notify the model
+                        ((DefaultTableModel) table.getModel()).fireTableCellUpdated(selectedRow, 4);
                         openBookForReading(selectedRow);
                     }
                 }
@@ -315,7 +302,7 @@ public class LibraryGUI {
         LibraryGUI libraryGUI = new LibraryGUI();
         frame.setContentPane(libraryGUI.rootPanel);
         frame.pack();
-        frame.setSize(600, 400); // Adjust the size as needed
+        frame.setSize(600, 400);
         frame.setVisible(true);
 
         frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
@@ -328,5 +315,40 @@ public class LibraryGUI {
                 }
             }
         });
+    }
+}
+
+class PopularityGraph extends JFrame {
+    private List<Book> books;
+
+    public PopularityGraph(List<Book> books) {
+        this.books = books;
+
+        setTitle("Popularity Graph");
+        setSize(670, 600);
+
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                dispose();
+            }
+        });
+
+        setVisible(true);
+    }
+
+    @Override
+    public void paint(Graphics g) {
+        super.paint(g);
+        int x = 50;
+        for (Book book : books) {
+            int popularityCount = book.getPopularityCount();
+            int barHeight = popularityCount * 60;
+
+            g.setColor(Color.blue);
+            g.fillRect(x, 550 - barHeight, 10, barHeight);
+
+            x += 70;
+        }
     }
 }
